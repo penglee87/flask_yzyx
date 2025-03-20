@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}财经资讯 - 有知有行{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">财经资讯</h4>
+                </div>
+                <div class="card-body">
+                    {% if news %}
+                        <div class="list-group">
+                            {% for item in news %}
+                                <a href="{{ url_for('main.news_detail', news_id=item.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ item.title }}</h5>
+                                        <small>{{ item.published_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ item.content[:150] }}...</p>
+                                    <small>来源: {{ item.source }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">暂无财经资讯</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

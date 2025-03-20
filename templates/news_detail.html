@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ news.title }} - 有知有行{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="mb-3">{{ news.title }}</h1>
+                <div class="text-muted mb-4">
+                    <span>来源: {{ news.source }}</span> | 
+                    <span>发布时间: {{ news.published_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+                {% if news.image_url %}
+                <div class="mb-4">
+                    <img src="{{ news.image_url }}" alt="{{ news.title }}" class="img-fluid rounded">
+                </div>
+                {% endif %}
+                <div class="news-content">
+                    {{ news.content|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">最新资讯</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for item in recent_news %}
+                        {% if item.id != news.id %}
+                        <a href="{{ url_for('news_detail', news_id=item.id) }}" class="list-group-item list-group-item-action px-0">
+                            {{ item.title }}
+                            <div class="text-muted small">{{ item.published_at.strftime('%Y-%m-%d') }}</div>
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-center">暂无其他资讯</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">相关文章</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for article in related_articles %}
+                        <a href="{{ url_for('article', article_id=article.id) }}" class="list-group-item list-group-item-action px-0">
+                            {{ article.title }}
+                        </a>
+                    {% else %}
+                        <p class="text-center">暂无相关文章</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

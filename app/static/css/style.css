@@ -1,0 +1,107 @@
+/* 全局样式 */
+body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 导航栏样式 */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* 卡片样式 */
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* 文章内容样式 */
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* 分类标签样式 */
+.category-badge {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* 表单样式 */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* 按钮样式 */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+/* 微信登录按钮样式 */
+.btn-wechat {
+    background-color: #07C160;
+    border-color: #07C160;
+    color: white;
+}
+
+.btn-wechat:hover {
+    background-color: #06ad56;
+    border-color: #06ad56;
+    color: white;
+}
+
+.login-divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.login-divider:before,
+.login-divider:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.login-divider:before {
+    left: 0;
+}
+
+.login-divider:after {
+    right: 0;
+}
+
+.wechat-qrcode-container {
+    text-align: center;
+    margin: 20px 0;
+    display: none;
+}
+
+/* 页脚样式 */
+footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}

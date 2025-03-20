@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}文章列表 - 有知有行{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% if category %}{{ category }}{% else %}全部文章{% endif %}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('question.articles') }}" class="btn btn-outline-primary {% if not category %}active{% endif %}">全部</a>
+                            <a href="{{ url_for('question.articles', category='投资策略') }}" class="btn btn-outline-primary {% if category == '投资策略' %}active{% endif %}">投资策略</a>
+                            <a href="{{ url_for('question.articles', category='基金分析') }}" class="btn btn-outline-primary {% if category == '基金分析' %}active{% endif %}">基金分析</a>
+                            <a href="{{ url_for('question.articles', category='股票研究') }}" class="btn btn-outline-primary {% if category == '股票研究' %}active{% endif %}">股票研究</a>
+                            <a href="{{ url_for('question.articles', category='财经知识') }}" class="btn btn-outline-primary {% if category == '财经知识' %}active{% endif %}">财经知识</a>
+                        </div>
+                    </div>
+                    
+                    {% if articles %}
+                        <div class="list-group">
+                            {% for article in articles %}
+                                <a href="{{ url_for('question.article', article_id=article.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ article.title }}</h5>
+                                        <small>{{ article.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ article.content[:150] }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="category-badge">{{ article.category }}</small>
+                                        <small>作者: {{ article.author.username }}</small>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">暂无文章</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

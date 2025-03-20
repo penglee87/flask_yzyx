@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}发布文章 - 有知有行{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">发布文章</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('user.create_article') }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">文章标题</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">文章分类</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">选择分类</option>
+                            <option value="投资策略">投资策略</option>
+                            <option value="基金分析">基金分析</option>
+                            <option value="股票研究">股票研究</option>
+                            <option value="财经知识">财经知识</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">文章内容</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">发布文章</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

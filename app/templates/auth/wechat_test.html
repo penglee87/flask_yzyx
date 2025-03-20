@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}微信登录测试 - 有知有行{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">微信登录测试工具</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <p>这是一个测试工具，用于模拟微信扫码登录流程。在实际项目中，这个页面不应该存在。</p>
+                </div>
+                
+                <form id="testForm" class="mb-4">
+                    <div class="form-group mb-3">
+                        <label for="loginState">登录状态码</label>
+                        <input type="text" class="form-control" id="loginState" placeholder="输入登录状态码">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">模拟微信扫码成功</button>
+                </form>
+                
+                <div id="result" class="alert alert-secondary" style="display: none;">
+                    <p id="resultMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const testForm = document.getElementById('testForm');
+        const resultDiv = document.getElementById('result');
+        const resultMessage = document.getElementById('resultMessage');
+        
+        testForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loginState = document.getElementById('loginState').value.trim();
+            if (!loginState) {
+                alert('请输入登录状态码');
+                return;
+            }
+            
+            // 设置本地存储，模拟微信扫码成功
+            localStorage.setItem(`wechat_login_success_${loginState}`, 'true');
+            
+            // 显示成功消息
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'alert alert-success';
+            resultMessage.textContent = `已成功模拟微信扫码登录，状态码: ${loginState}`;
+            
+            // 添加一个链接，可以直接跳转到登录页面进行测试
+            const testLink = document.createElement('a');
+            testLink.href = `/auth/check-wechat-login/${loginState}?test_mode=1`;
+            testLink.className = 'btn btn-primary mt-3 d-block';
+            testLink.textContent = '测试登录状态检查';
+            testLink.target = '_blank';
+            resultMessage.appendChild(document.createElement('br'));
+            resultMessage.appendChild(testLink);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block title %}有知有行 - 发布文章{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">发布新文章</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">文章标题</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">文章分类</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="" selected disabled>请选择分类</option>
+                            <option value="投资策略">投资策略</option>
+                            <option value="基金分析">基金分析</option>
+                            <option value="股票研究">股票研究</option>
+                            <option value="财经知识">财经知识</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">文章内容</label>
+                        <textarea class="form-control" id="content" name="content" rows="15" required></textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('articles') }}" class="btn btn-outline-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">发布文章</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 可以在这里添加富文本编辑器的初始化代码
+    // 例如使用 CKEditor、TinyMCE 等
+</script>
+{% endblock %}

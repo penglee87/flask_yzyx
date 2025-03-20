@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}首页 - 有知有行{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">最新文章</h4>
+                    <a href="{{ url_for('question.articles') }}" class="btn btn-sm btn-light">查看更多</a>
+                </div>
+                <div class="card-body">
+                    {% if articles %}
+                        <div class="list-group">
+                            {% for article in articles %}
+                                <a href="{{ url_for('question.article', article_id=article.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ article.title }}</h5>
+                                        <small>{{ article.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ article.content[:100] }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="category-badge">{{ article.category }}</small>
+                                        <small>作者: {{ article.author.username }}</small>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">暂无文章</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">财经资讯</h4>
+                    <a href="{{ url_for('main.financial_news') }}" class="btn btn-sm btn-light">查看更多</a>
+                </div>
+                <div class="card-body">
+                    {% if news %}
+                        <div class="list-group">
+                            {% for item in news %}
+                                <a href="{{ url_for('main.news_detail', news_id=item.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ item.title }}</h6>
+                                    </div>
+                                    <small>{{ item.published_at.strftime('%Y-%m-%d') }} | {{ item.source }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">暂无资讯</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

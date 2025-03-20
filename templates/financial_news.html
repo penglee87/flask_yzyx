@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block title %}有知有行 - 财经资讯{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">财经资讯</h5>
+            </div>
+            <div class="card-body">
+                {% if news %}
+                    {% for item in news %}
+                        <div class="mb-4">
+                            <h3><a href="{{ url_for('news_detail', news_id=item.id) }}" class="text-decoration-none">{{ item.title }}</a></h3>
+                            <div class="text-muted small mb-2">
+                                <span>来源: {{ item.source }}</span> | 
+                                <span>发布时间: {{ item.published_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            <p>{{ item.content[:200] }}{% if item.content|length > 200 %}...{% endif %}</p>
+                            <a href="{{ url_for('news_detail', news_id=item.id) }}" class="btn btn-sm btn-outline-primary">阅读全文</a>
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center">暂无财经资讯</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">关于财经资讯</h5>
+            </div>
+            <div class="card-body">
+                <p>本栏目提供最新的财经动态、市场分析和投资机会，帮助投资者及时了解市场变化，把握投资机会。</p>
+                <p>资讯内容仅供参考，不构成任何投资建议。投资有风险，入市需谨慎。</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">热门文章</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for article in popular_articles %}
+                        <a href="{{ url_for('article', article_id=article.id) }}" class="list-group-item list-group-item-action px-0">
+                            {{ article.title }}
+                        </a>
+                    {% else %}
+                        <p class="text-center">暂无热门文章</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

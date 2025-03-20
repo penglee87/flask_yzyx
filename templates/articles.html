@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block title %}有知有行 - {% if category %}{{ category }}{% else %}全部文章{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% if category %}{{ category }}{% else %}全部文章{% endif %}</h5>
+            </div>
+            <div class="card-body">
+                {% if articles %}
+                    {% for article in articles %}
+                        <div class="mb-4">
+                            <h3><a href="{{ url_for('article', article_id=article.id) }}" class="text-decoration-none">{{ article.title }}</a></h3>
+                            <div class="text-muted small mb-2">
+                                <span>分类: {{ article.category }}</span> | 
+                                <span>作者: {{ article.author.username }}</span> | 
+                                <span>发布时间: {{ article.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            <p>{{ article.content[:200] }}{% if article.content|length > 200 %}...{% endif %}</p>
+                            <a href="{{ url_for('article', article_id=article.id) }}" class="btn btn-sm btn-outline-primary">阅读全文</a>
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center">暂无文章</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">文章分类</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('articles') }}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                        全部文章
+                    </a>
+                    <a href="{{ url_for('articles', category='投资策略') }}" class="list-group-item list-group-item-action {% if category == '投资策略' %}active{% endif %}">
+                        投资策略
+                    </a>
+                    <a href="{{ url_for('articles', category='基金分析') }}" class="list-group-item list-group-item-action {% if category == '基金分析' %}active{% endif %}">
+                        基金分析
+                    </a>
+                    <a href="{{ url_for('articles', category='股票研究') }}" class="list-group-item list-group-item-action {% if category == '股票研究' %}active{% endif %}">
+                        股票研究
+                    </a>
+                    <a href="{{ url_for('articles', category='财经知识') }}" class="list-group-item list-group-item-action {% if category == '财经知识' %}active{% endif %}">
+                        财经知识
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        {% if current_user.is_authenticated %}
+        <div class="card">
+            <div class="card-body">
+                <a href="{{ url_for('create_article') }}" class="btn btn-primary w-100">发布新文章</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

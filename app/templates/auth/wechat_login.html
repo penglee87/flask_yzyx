@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+
+{% block title %}微信登录 - 有知有行{% endblock %}
+
+{% block extra_css %}
+<style>
+    .qrcode-container {
+        text-align: center;
+        margin: 30px auto;
+        max-width: 300px;
+    }
+    
+    .qrcode-wrapper {
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    #qrcode {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+    }
+    
+    .qrcode-tip {
+        margin-top: 15px;
+        color: #666;
+    }
+    
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0,0,0,0.1);
+        border-radius: 50%;
+        border-top-color: #07C160;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- 引入QRCode.js库 -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取登录状态码
+        const loginState = '{{ login_state }}';
+        
+        // 生成二维码
+        // 使用当前应用的URL，确保手机可以访问
+        // 获取当前页面的完整URL（包括协议、主机名和端口）
+        const serverDomain = window.location.origin;
+        // 如果在本地开发环境，可以使用局域网IP地址替代localhost
+        // 这样手机和电脑在同一网络下可以互相访问
+        const qrcodeUrl = `${serverDomain}/auth/wechat-auth?state=${loginState}`;
+        
+        // 初始化二维码
+        new QRCode(document.getElementById("qrcode"), {
+            text: qrcodeUrl,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        // 定期检查登录状态
+        const statusElement = document.getElementById('loginStatus');
+        let waitingTime = 0;
+        
+        const checkLoginStatus = () => {
+            // 首先检查本地存储中是否有登录成功的标志
+            const localStorageKey = `wechat_login_success_${loginState}`;
+            if (localStorage.getItem(localStorageKey)) {
+                // 如果本地存储中有登录成功标志，说明手机端已经扫码成功
+                localStorage.removeItem(localStorageKey); // 清除标志，避免重复处理
+                
+                // 登录成功，显示成功信息
+                statusElement.innerHTML = '登录成功，请点击下方按钮进入系统';
+                
+                // 添加一个确认按钮，让用户手动确认进入系统
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'btn btn-success mt-3';
+                confirmBtn.innerText = '进入系统';
+                confirmBtn.onclick = function() {
+                    window.location.href = '{{ url_for("main.index") }}';
+                };
+                
+                // 添加确认按钮
+                document.querySelector('.qrcode-wrapper').appendChild(confirmBtn);
+                return; // 不再继续检查
+            }
+            
+            // 如果本地存储中没有登录成功标志，则继续通过API检查
+            fetch(`/auth/check-wechat-login/${loginState}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // 登录成功，显示成功信息
+                        statusElement.innerHTML = '登录成功，请点击下方按钮进入系统';
+                        
+                        // 添加一个确认按钮，让用户手动确认进入系统
+                        const confirmBtn = document.createElement('button');
+                        confirmBtn.className = 'btn btn-success mt-3';
+                        confirmBtn.innerText = '进入系统';
+                        confirmBtn.onclick = function() {
+                            window.location.href = '{{ url_for("main.index") }}';
+                        };
+                        
+                        // 清除之前的计时器
+                        document.querySelector('.qrcode-wrapper').appendChild(confirmBtn);
+                    } else {
+                        // 继续等待，更新等待时间
+                        waitingTime += 5;
+                        statusElement.innerHTML = `<span class="loading-spinner"></span>等待扫码...已等待${waitingTime}秒`;
+                        // 增加检查间隔到5秒
+                        setTimeout(checkLoginStatus, 5000);
+                    }
+                })
+                .catch(error => {
+                    console.error('检查登录状态出错:', error);
+                    statusElement.innerHTML = '检查登录状态出错，请刷新页面重试';
+                });
+        };
+        
+        // 开始检查登录状态，初始延迟5秒
+        setTimeout(checkLoginStatus, 5000);
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">微信扫码登录</h4>
+            </div>
+            <div class="card-body">
+                <div class="qrcode-container">
+                    <div class="qrcode-wrapper">
+                        <div id="qrcode"></div>
+                        <p class="qrcode-tip">请使用微信扫描二维码登录</p>
+                        <p id="loginStatus">
+                            <span class="loading-spinner"></span>
+                            等待扫码...
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">
+                        返回账号密码登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

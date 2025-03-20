@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}管理员创建文章 - 有知有行{% endblock %}
+
+{% block extra_css %}
+<!-- 引入TinyMCE样式 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tinymce@5/skins/ui/oxide/skin.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">管理员创建文章</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('question.create_article') }}" enctype="multipart/form-data" id="articleForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">文章标题</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">文章分类</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">选择分类</option>
+                            <option value="投资策略">投资策略</option>
+                            <option value="基金分析">基金分析</option>
+                            <option value="股票研究">股票研究</option>
+                            <option value="财经知识">财经知识</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">文章内容</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        <div class="form-text">您可以在编辑器中插入多张图片，支持JPG、PNG、GIF格式</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">文章图片</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <div class="form-text">支持JPG、PNG、GIF格式图片，建议尺寸不超过2MB</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">发布文章</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- 引入TinyMCE编辑器 -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@5/tinymce.min.js"></script>
+<script>
+tinymce.init({
+    selector: '#content',
+    plugins: 'image code link lists table',
+    toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+    height: 400,
+    language: 'zh_CN',
+    images_upload_url: '{{ url_for("question.upload_image") }}',
+    automatic_uploads: true,
+    images_reuse_filename: false,
+    relative_urls: false,
+    remove_script_host: false,
+    convert_urls: false,
+    // 图片上传处理
+    images_upload_handler: function (blobInfo, success, failure) {
+        var xhr, formData;
+        xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+        xhr.open('POST', '{{ url_for("question.upload_image") }}');
+        // 添加CSRF令牌到请求头
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token() }}');
+        
+        xhr.onload = function() {
+            var json;
+            
+            if (xhr.status != 200) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+            }
+            
+            try {
+                json = JSON.parse(xhr.responseText);
+            } catch (e) {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+            
+            if (!json || typeof json.url != 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+            
+            success(json.url);
+        };
+        
+        formData = new FormData();
+        formData.append('upload', blobInfo.blob(), blobInfo.filename());
+        
+        xhr.send(formData);
+    }
+});
+
+// 确保表单提交前内容已保存
+document.getElementById('articleForm').addEventListener('submit', function(e) {
+    // 确保TinyMCE编辑器内容已同步到表单
+    tinymce.triggerSave();
+    // 不需要阻止默认提交行为
+});
+</script>
+{% endblock %}

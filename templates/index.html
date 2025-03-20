@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+{% block title %}有知有行 - 首页{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">精选文章</h5>
+            </div>
+            <div class="card-body">
+                {% if articles %}
+                    {% for article in articles %}
+                        <div class="mb-4">
+                            <h3><a href="{{ url_for('article', article_id=article.id) }}" class="text-decoration-none">{{ article.title }}</a></h3>
+                            <div class="text-muted small mb-2">
+                                <span>分类: {{ article.category }}</span> | 
+                                <span>作者: {{ article.author.username }}</span> | 
+                                <span>发布时间: {{ article.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            <p>{{ article.content[:200] }}{% if article.content|length > 200 %}...{% endif %}</p>
+                            <a href="{{ url_for('article', article_id=article.id) }}" class="btn btn-sm btn-outline-primary">阅读全文</a>
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                    <div class="text-end mt-3">
+                        <a href="{{ url_for('articles') }}" class="btn btn-primary">查看更多文章</a>
+                    </div>
+                {% else %}
+                    <p class="text-center">暂无文章</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">最新资讯</h5>
+            </div>
+            <div class="card-body">
+                {% if news %}
+                    <ul class="list-group list-group-flush">
+                        {% for item in news %}
+                            <li class="list-group-item px-0">
+                                <a href="{{ url_for('news_detail', news_id=item.id) }}" class="text-decoration-none">
+                                    {{ item.title }}
+                                </a>
+                                <div class="text-muted small">{{ item.published_at.strftime('%Y-%m-%d') }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="text-end mt-3">
+                        <a href="{{ url_for('financial_news') }}" class="btn btn-sm btn-outline-primary">查看更多资讯</a>
+                    </div>
+                {% else %}
+                    <p class="text-center">暂无资讯</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">关于有知有行</h5>
+            </div>
+            <div class="card-body">
+                <p>有知有行是一个专业的财经知识平台，致力于为用户提供高质量的投资知识、市场分析和财经资讯。</p>
+                <p>我们的使命是帮助每一位投资者建立正确的投资理念，掌握科学的投资方法，实现财务自由。</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
