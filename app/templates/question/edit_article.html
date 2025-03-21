@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}管理员创建文章 - 有知有行{% endblock %}
+{% block title %}编辑文章 - 有知有行{% endblock %}
 
 {% block extra_css %}
 <!-- 引入TinyMCE样式 -->
@@ -12,37 +12,44 @@
     <div class="col-md-10">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">管理员创建文章</h4>
+                <h4 class="mb-0">编辑文章</h4>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('question.create_article') }}" enctype="multipart/form-data" id="articleForm">
+                <form method="POST" action="{{ url_for('question.edit_article', article_id=article.id) }}" enctype="multipart/form-data" id="articleForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="title" class="form-label">文章标题</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ article.title }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="category" class="form-label">文章分类</label>
                         <select class="form-select" id="category" name="category" required>
                             <option value="">选择分类</option>
-                            <option value="投资策略">投资策略</option>
-                            <option value="基金分析">基金分析</option>
-                            <option value="股票研究">股票研究</option>
-                            <option value="财经知识">财经知识</option>
+                            <option value="投资策略" {% if article.category == '投资策略' %}selected{% endif %}>投资策略</option>
+                            <option value="基金分析" {% if article.category == '基金分析' %}selected{% endif %}>基金分析</option>
+                            <option value="股票研究" {% if article.category == '股票研究' %}selected{% endif %}>股票研究</option>
+                            <option value="财经知识" {% if article.category == '财经知识' %}selected{% endif %}>财经知识</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="content" class="form-label">文章内容</label>
-                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        <textarea class="form-control" id="content" name="content" rows="10" required>{{ article.content }}</textarea>
                         <div class="form-text">您可以在编辑器中插入多张图片，支持JPG、PNG、GIF格式</div>
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">文章图片</label>
+                        {% if article.image_url %}
+                        <div class="mb-2">
+                            <img src="{{ url_for('static', filename=article.image_url) }}" class="img-thumbnail" style="max-height: 200px;" alt="当前图片">
+                            <p class="form-text">当前图片</p>
+                        </div>
+                        {% endif %}
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                        <div class="form-text">支持JPG、PNG、GIF格式图片，建议尺寸不超过2MB</div>
+                        <div class="form-text">支持JPG、PNG、GIF格式图片，建议尺寸不超过2MB。如果不上传新图片，将保留原图片。</div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">发布文章</button>
+                        <button type="submit" class="btn btn-primary">更新文章</button>
+                        <a href="{{ url_for('question.article', article_id=article.id) }}" class="btn btn-outline-secondary">取消</a>
                     </div>
                 </form>
             </div>
@@ -115,8 +122,6 @@ tinymce.init({
 document.getElementById('articleForm').addEventListener('submit', function(e) {
     // 确保TinyMCE编辑器内容已同步到表单
     tinymce.triggerSave();
-    // 不要使用return true，这在事件处理程序中不会有效果
-    // 表单会自动提交，不需要额外操作
 });
 </script>
 {% endblock %}

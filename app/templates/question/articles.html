@@ -24,17 +24,20 @@
                     {% if articles %}
                         <div class="list-group">
                             {% for article in articles %}
-                                <a href="{{ url_for('question.article', article_id=article.id) }}" class="list-group-item list-group-item-action">
+                                <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">{{ article.title }}</h5>
-                                        <small>{{ article.created_at.strftime('%Y-%m-%d') }}</small>
+                                        <h5 class="mb-1"><a href="{{ url_for('question.article', article_id=article.id) }}" class="text-decoration-none">{{ article.title }}</a></h5>
+                                        <div class="d-flex align-items-center">
+                                            {% if current_user.is_authenticated and current_user.is_admin() %}
+                                            <div class="btn-group me-2">
+                                                <a href="{{ url_for('question.edit_article', article_id=article.id) }}" class="btn btn-sm btn-outline-primary">编辑</a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article.id }}">删除</button>
+                                            </div>
+                                            {% endif %}
+                                            <small>{{ article.created_at.strftime('%Y-%m-%d') }}</small>
+                                        </div>
                                     </div>
-                                    <p class="mb-1">{{ article.content[:150] }}...</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="category-badge">{{ article.category }}</small>
-                                        <small>作者: {{ article.author.username }}</small>
-                                    </div>
-                                </a>
+                                </div>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -45,4 +48,31 @@
         </div>
     </div>
 </div>
+
+<!-- 删除确认模态框 -->
+{% if current_user.is_authenticated and current_user.is_admin() %}
+{% for article in articles %}
+<div class="modal fade" id="deleteModal{{ article.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ article.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ article.id }}">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除文章 "{{ article.title }}" 吗？</p>
+                <p class="text-danger">此操作不可逆，文章的所有评论也将被删除。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form action="{{ url_for('question.delete_article', article_id=article.id) }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 {% endblock %}

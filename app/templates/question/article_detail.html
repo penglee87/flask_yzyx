@@ -8,8 +8,14 @@
         <div class="col-md-10 offset-md-1">
             <!-- 文章内容卡片 -->
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">{{ article.title }}</h4>
+                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                    <div>
+                        <a href="{{ url_for('question.edit_article', article_id=article.id) }}" class="btn btn-sm btn-light">编辑</a>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">删除</button>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
@@ -116,6 +122,31 @@
         </div>
     </div>
 </div>
+
+<!-- 删除确认模态框 -->
+{% if current_user.is_authenticated and current_user.is_admin() %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除文章 "{{ article.title }}" 吗？</p>
+                <p class="text-danger">此操作不可逆，文章的所有评论也将被删除。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form action="{{ url_for('question.delete_article', article_id=article.id) }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_css %}

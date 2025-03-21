@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, current_app
+from flask import render_template, request, redirect, url_for, flash, current_app, abort
 from flask_login import current_user, login_required
 from app.question import bp
 from app.models import Article, Comment, User
@@ -44,6 +44,24 @@ def article(article_id):
     # 获取文章评论（只获取顶级评论，不包括回复）
     comments = Comment.query.filter_by(article_id=article_id, parent_id=None).order_by(Comment.created_at.desc()).all()
     return render_template('question/article_detail.html', article=article, comments=comments)
+
+# 管理员删除文章路由
+@bp.route('/delete_article/<int:article_id>', methods=['POST'])
+@login_required
+def delete_article(article_id):
+    # 检查是否为管理员
+    if not current_user.is_admin():
+        flash('只有管理员才能删除文章')
+        return redirect(url_for('question.articles'))
+    
+    article = Article.query.get_or_404(article_id)
+    
+    # 删除文章（级联删除相关评论）
+    db.session.delete(article)
+    db.session.commit()
+    
+    flash('文章已成功删除')
+    return redirect(url_for('question.articles'))
 
 # 允许的图片文件扩展名
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -91,3 +109,44 @@ def create_article():
             return redirect(url_for('question.article', article_id=article.id))
     
     return render_template('question/create_article.html')
+
+# 管理员编辑文章路由
+@bp.route('/edit_article/<int:article_id>', methods=['GET', 'POST'])
+@login_required
+def edit_article(article_id):
+    # 检查是否为管理员
+    if not current_user.is_admin():
+        flash('只有管理员才能编辑文章')
+        return redirect(url_for('question.articles'))
+    
+    article = Article.query.get_or_404(article_id)
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        category = request.form.get('category')
+        image = request.files.get('image')
+        
+        if image and image.filename and allowed_file(image.filename):
+            # 生成安全的文件名
+            filename = secure_filename(image.filename)
+            # 添加唯一标识符，避免文件名冲突
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            # 确保上传目录存在
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+            os.makedirs(upload_folder, exist_ok=True)
+            # 保存文件
+            image_path = os.path.join(upload_folder, unique_filename)
+            image.save(image_path)
+            # 设置图片URL（相对路径，用于在模板中显示）
+            article.image_url = f"uploads/{unique_filename}"
+        
+        if title and content and category:
+            article.title = title
+            article.content = content
+            article.category = category
+            db.session.commit()
+            flash('文章更新成功')
+            return redirect(url_for('question.article', article_id=article.id))
+    
+    return render_template('question/edit_article.html', article=article)

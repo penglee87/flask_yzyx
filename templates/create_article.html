@@ -10,7 +10,8 @@
                 <h5 class="mb-0">发布新文章</h5>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="POST" action="{{ url_for('question.create_article') }}" enctype="multipart/form-data" id="articleForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="title" class="form-label">文章标题</label>
                         <input type="text" class="form-control" id="title" name="title" required>
@@ -41,8 +42,32 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- 引入TinyMCE编辑器 -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@5/tinymce.min.js"></script>
 <script>
-    // 可以在这里添加富文本编辑器的初始化代码
-    // 例如使用 CKEditor、TinyMCE 等
+tinymce.init({
+    selector: '#content',
+    plugins: 'image code link lists table',
+    toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+    height: 400,
+    language: 'zh_CN',
+    images_upload_url: '{{ url_for("question.upload_image") }}',
+    automatic_uploads: true,
+    images_reuse_filename: false,
+    relative_urls: false,
+    remove_script_host: false,
+    convert_urls: false,
+    setup: function(editor) {
+        editor.on('change', function() {
+            tinymce.triggerSave();
+        });
+    }
+});
+
+// 确保表单提交前内容已保存
+document.getElementById('articleForm').addEventListener('submit', function(e) {
+    // 确保TinyMCE编辑器内容已同步到表单
+    tinymce.triggerSave();
+});
 </script>
 {% endblock %}
